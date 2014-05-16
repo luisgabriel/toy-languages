@@ -43,7 +43,16 @@
 
 (def transform-options
   {:int-literal read-string
-   :bool-literal read-string})
+   :bool-literal read-string
+   :not #(identity :not)
+   :length #(identity :length)
+   :binary-exp (fn [e1 op e2] [:binary-exp op e1 e2])
+   :plus #(identity :add)
+   :minus #(identity :minus)
+   :and #(identity :and)
+   :or #(identity :or)
+   :eq #(identity :equals)
+   :concat #(identity :concat)})
 
 (defn parse [input]
   (->> (parser input) (insta/transform transform-options)))
