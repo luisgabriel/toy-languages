@@ -24,7 +24,7 @@
       :minus (- lvalue rvalue)
       :and (and lvalue rvalue)
       :or (or lvalue rvalue)
-      :equals (.equals lvalue rvalue)
+      :equals (= lvalue rvalue)
       :concat (concat lvalue rvalue))))
 
 (defn- eval-exp [exp]
