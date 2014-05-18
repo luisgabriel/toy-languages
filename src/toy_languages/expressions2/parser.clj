@@ -4,9 +4,12 @@
 (def grammar
   "program = exp
 
-   <exp> = cexp | unary-exp | binary-exp
+   <exp> = cexp
+         | unary-exp
+         | binary-exp
+         | let-exp
 
-   <cexp> = value | <'('> exp <')'>
+   <cexp> = value | const-id | <'('> exp <')'>
 
    value = int | bool | string
 
@@ -21,6 +24,11 @@
               | exp eq cexp
               | exp concat cexp
 
+   let-exp = <'let'> const-dec <'in'> exp
+
+   <const-dec> = <'var'> const-id <'='> exp
+               | const-dec <','> const-dec
+
    int = int-literal
    bool = bool-literal
    string = string-literal
@@ -32,12 +40,19 @@
    or = <'or'>
    eq = <'=='>
    concat = <'++'>
+   const-id = #'[A-Za-z][A-Za-z0-9]*'
 
    int-literal = #'\\d+'
    bool-literal = 'true' | 'false'
    <string-literal> = <'\"'> #'[A-Za-z0-9]*' <'\"'>")
 
 (def parser (insta/parser grammar :auto-whitespace :standard))
+
+(defn- transform-let-exp [& args]
+  (let [exp (last args)
+        decs (drop-last args)
+        grouped-decs (partition 2 decs)]
+    [:let-exp (vec (map vec grouped-decs)) exp]))
 
 (def transform-options
   {:int-literal read-string
@@ -50,7 +65,8 @@
    :and #(identity :and)
    :or #(identity :or)
    :eq #(identity :equals)
-   :concat #(identity :concat)})
+   :concat #(identity :concat)
+   :let-exp transform-let-exp})
 
 (defn parse [input]
   (let [result (->> (parser input) (insta/transform transform-options))]
