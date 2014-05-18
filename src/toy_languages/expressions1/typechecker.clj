@@ -1,5 +1,7 @@
 (ns toy-languages.expressions1.typechecker)
 
+(declare check-exp)
+
 (defn- type-value [value]
   (first (first value)))
 
@@ -28,34 +30,31 @@
       :unary-exp (type-unary subtree)
       :binary-exp (type-binary subtree))))
 
-(defn- check-exp-type [exp expected-type]
-  (let [exp-type (type-exp exp)]
-    (= exp-type expected-type)))
-
 (defn- check-unary [ast]
   (let [node (first ast)
         exp (nth ast 1)]
     (and
       (check-exp exp)
       (case node
-        :minus (check-exp-type exp :int)
-        :not (check-exp-type exp :bool)
-        :length (check-exp-type exp :string)))))
+        :minus (= (type-exp exp) :int)
+        :not (= (type-exp exp) :bool)
+        :length (= (type-exp exp) :string)))))
 
 (defn- check-binary [ast]
   (let [op (first ast)
         lexp (nth ast 1)
-        rexp (nth ast 2)]
+        rexp (nth ast 2)
+        is-type #(= (type-exp %1) %2)]
     (and
       (check-exp lexp)
       (check-exp rexp)
       (case op
-        :add (and (check-exp-type lexp :int) (check-exp-type rexp :int))
-        :minus (and (check-exp-type lexp :int) (check-exp-type rexp :int))
-        :and (and (check-exp-type lexp :bool) (check-exp-type rexp :bool))
-        :or (and (check-exp-type lexp :bool) (check-exp-type rexp :bool))
+        :add (and (is-type lexp :int) (is-type rexp :int))
+        :minus (and (is-type lexp :int) (is-type rexp :int))
+        :and (and (is-type lexp :bool) (is-type rexp :bool))
+        :or (and (is-type lexp :bool) (is-type rexp :bool))
         :equals (= (type-exp lexp) (type-exp rexp))
-        :concat (and (check-exp-type lexp :string) (check-exp-type rexp :string))))))
+        :concat (and (is-type lexp :string) (is-type rexp :string))))))
 
 (defn- check-exp [exp]
   (let [kind (first exp)
