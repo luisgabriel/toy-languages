@@ -5,6 +5,12 @@
 (defn- type-value [value]
   (first (first value)))
 
+(defn- type-id [table id]
+  (let [id-key (keyword id)]
+    (if (contains? table id-key)
+      (table (keyword id))
+      (throw (Throwable. (str "Unknown constant '" id "'."))))))
+
 (defn- type-unary [exp]
   (let [op (first exp)]
     (case op
@@ -22,32 +28,61 @@
       :equals :bool
       :concat :string)))
 
-(defn- type-exp [exp]
+(defn- type-exp [table exp]
   (let [kind (first exp)
         subtree (subvec exp 1)]
     (case kind
       :value (type-value subtree)
+      :const-id (type-id table (first subtree))
       :unary-exp (type-unary subtree)
       :binary-exp (type-binary subtree))))
 
-(defn- check-unary [ast]
-  (let [node (first ast)
-        exp (nth ast 1)]
-    (and
-      (check-exp exp)
-      (case node
-        :minus (= (type-exp exp) :int)
-        :not (= (type-exp exp) :bool)
-        :length (= (type-exp exp) :string)))))
+(defn- update-table [table decs]
+  (loop [ds decs t table]
+    (if (empty? ds)
+      t
+      (let [d (first ds)
+            const-id (first d)
+            value (nth d 1)
+            id (nth const-id 1)
+            var-type (first (nth value 1))
+            id-key (keyword id)
+            new-table (assoc t id-key var-type)]
+        (if (contains? t id-key)
+          (throw (Throwable. (str "Constant '" id "' already declared!")))
+          (recur (subvec ds 1) new-table))))))
 
-(defn- check-binary [ast]
+(defn- check-id [table id]
+  (if (contains? table (keyword id))
+    true
+    (Throwable. (str "Unknown constant '" id "'."))))
+
+(defn- check-let [table content]
+  (let [decs (first content)
+        exp (nth content 1)
+        new-table (update-table table decs)]
+    (check-exp new-table exp)))
+
+(defn- check-unary [table ast]
+  (let [node (first ast)
+        exp (nth ast 1)
+        is-type #(= (type-exp table exp) %)]
+    (println table)
+    (and
+      (check-exp table exp)
+      (case node
+        :minus (is-type :int)
+        :not (is-type :bool)
+        :length (is-type :string)))))
+
+(defn- check-binary [table ast]
   (let [op (first ast)
         lexp (nth ast 1)
         rexp (nth ast 2)
-        is-type #(= (type-exp %1) %2)]
+        is-type #(= (type-exp table %1) %2)]
     (and
-      (check-exp lexp)
-      (check-exp rexp)
+      (check-exp table lexp)
+      (check-exp table rexp)
       (case op
         :add (and (is-type lexp :int) (is-type rexp :int))
         :minus (and (is-type lexp :int) (is-type rexp :int))
@@ -56,17 +91,19 @@
         :equals (= (type-exp lexp) (type-exp rexp))
         :concat (and (is-type lexp :string) (is-type rexp :string))))))
 
-(defn- check-exp [exp]
+(defn- check-exp [table exp]
   (let [kind (first exp)
         subtree (subvec exp 1)]
     (case kind
       :value true
-      :unary-exp (check-unary subtree)
-      :binary-exp (check-binary subtree))))
+      :const-id (check-id table (first subtree))
+      :let-exp (check-let table subtree)
+      :unary-exp (check-unary table subtree)
+      :binary-exp (check-binary table subtree))))
 
 (defn check [ast]
   (let [node (first ast)
         tree (nth ast 1)]
     (case node
-      :program (check-exp tree)
+      :program (check-exp {} tree)
       false)))
