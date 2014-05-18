@@ -53,7 +53,8 @@
    :concat #(identity :concat)})
 
 (defn parse [input]
-  (->> (parser input) (insta/transform transform-options)))
+  (let [result (->> (parser input) (insta/transform transform-options))]
+    [(not (insta/failure? result)) result]))
 
 (defn parses [input]
   (insta/parses parser input))
