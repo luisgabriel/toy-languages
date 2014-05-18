@@ -54,7 +54,7 @@
         :minus (and (check-exp-type lexp :int) (check-exp-type rexp :int))
         :and (and (check-exp-type lexp :bool) (check-exp-type rexp :bool))
         :or (and (check-exp-type lexp :bool) (check-exp-type rexp :bool))
-        :equals (and (check-exp-type lexp :string) (check-exp-type rexp :string))
+        :equals (= (type-exp lexp) (type-exp rexp))
         :concat (and (check-exp-type lexp :string) (check-exp-type rexp :string))))))
 
 (defn- check-exp [exp]
