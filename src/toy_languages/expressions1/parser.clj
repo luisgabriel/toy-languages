@@ -35,7 +35,7 @@
 
    int-literal = #'\\d+'
    bool-literal = 'true' | 'false'
-   <string-literal> = <'\"'> #'[A-Za-z0-9]+' <'\"'>")
+   <string-literal> = <'\"'> #'[A-Za-z0-9]*' <'\"'>")
 
 (def parser (insta/parser grammar :auto-whitespace :standard))
 
