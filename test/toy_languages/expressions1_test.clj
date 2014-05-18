@@ -13,6 +13,11 @@
 (def simple-eq "true == false")
 (def simple-concat "\"a\" ++ \"b\"")
 
+(def binary-precedence1 "1 - 2 + 3")
+(def binary-precedence2 "1 - (2 + 3)")
+(def unary-precedence1 "- 1 + 2")
+(def unary-precedence2 "- (1 + 2)")
+
 (deftest parse-single-value1-test
   (testing "Parsing a single integer value"
     (def result (exp1/parse single-value1))
@@ -32,7 +37,7 @@
     (is (= result expected))))
 
 (deftest parse-single-value4-test
-  (testing "Parsing a single value enclosed by parenthesis"
+  (testing "Parsing a single boolean value"
     (def result (exp1/parse single-value4))
     (def expected [:program [:value [:bool true]]])
     (is (= result expected))))
@@ -44,9 +49,9 @@
     (is (= result expected))))
 
 (deftest parse-simple-sub-test
-  (testing "Parsing a subtraction between two integers"
+  (testing "Parsing a minustraction between two integers"
     (def result (exp1/parse simple-sub))
-    (def expected [:program [:binary-exp :sub [:value [:int 4]] [:value [:int 7]]]])
+    (def expected [:program [:binary-exp :minus [:value [:int 4]] [:value [:int 7]]]])
     (is (= result expected))))
 
 (deftest parse-simple-and-test
@@ -71,4 +76,28 @@
   (testing "Parsing an concat between two strings"
     (def result (exp1/parse simple-concat))
     (def expected [:program [:binary-exp :concat [:value [:string "a"]] [:value [:string "b"]]]])
+    (is (= result expected))))
+
+(deftest parse-binary-precedence1-test
+  (testing "Parsing a three-factor operation"
+    (def result (exp1/parse binary-precedence1))
+    (def expected [:program [:binary-exp :add [:binary-exp :minus [:value [:int 1]] [:value [:int 2]]] [:value [:int 3]]]])
+    (is (= result expected))))
+
+(deftest parse-binary-precedence2-test
+  (testing "Parsing a three-factor operation with parentheses"
+    (def result (exp1/parse binary-precedence2))
+    (def expected [:program [:binary-exp :minus [:value [:int 1]] [:binary-exp :add [:value [:int 2]] [:value [:int 3]]]]])
+    (is (= result expected))))
+
+(deftest parse-unary-precedence1-test
+  (testing "Parsing a unary and binary operation"
+    (def result (exp1/parse unary-precedence1))
+    (def expected [:program [:binary-exp :add [:unary-exp :minus [:value [:int 1]]] [:value [:int 2]]]])
+    (is (= result expected))))
+
+(deftest parse-unary-precedence2-test
+  (testing "Parsing a unary and binary operation with parentheses"
+    (def result (exp1/parse unary-precedence2))
+    (def expected [:program [:unary-exp :minus [:binary-exp :add [:value [:int 1]] [:value [:int 2]]]]])
     (is (= result expected))))

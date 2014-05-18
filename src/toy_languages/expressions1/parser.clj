@@ -3,23 +3,24 @@
 
 (def parser
   (insta/parser
-    "program = fexp
-     <fexp> = exp | <lparen> exp <rparen>
+    "program = exp
 
-     <exp> = value | unary-exp | binary-exp
+     <exp> = cexp | unary-exp | binary-exp
+
+     <cexp> = value | <'('> exp <')'>
 
      value = int | bool | string
 
-     unary-exp = minus fexp
-               | not fexp
-               | length fexp
+     unary-exp = minus cexp
+               | not cexp
+               | length cexp
 
-     binary-exp = fexp plus fexp
-                | fexp minus fexp
-                | fexp and fexp
-                | fexp or fexp
-                | fexp eq fexp
-                | fexp concat fexp
+     binary-exp = exp plus cexp
+                | exp minus cexp
+                | exp and cexp
+                | exp or cexp
+                | exp eq cexp
+                | exp concat cexp
 
      int = int-literal
      bool = bool-literal
@@ -35,10 +36,7 @@
 
      int-literal = #'\\d+'
      bool-literal = 'true' | 'false'
-     <string-literal> = <'\"'> #'[A-Za-z0-9]+' <'\"'>
-     <lparen> = <'('>
-     <rparen> = <')'>
-    "
+     <string-literal> = <'\"'> #'[A-Za-z0-9]+' <'\"'>"
     :auto-whitespace :standard))
 
 (def transform-options
@@ -56,3 +54,6 @@
 
 (defn parse [input]
   (->> (parser input) (insta/transform transform-options)))
+
+(defn parses [input]
+  (insta/parses parser input))
