@@ -9,7 +9,7 @@
          | binary-exp
          | let-exp
 
-   <cexp> = value | const-id | <'('> exp <')'>
+   <cexp> = value / const-id / <'('> exp <')'>
 
    value = int | bool | string
 
