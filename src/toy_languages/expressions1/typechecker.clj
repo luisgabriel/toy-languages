@@ -15,7 +15,7 @@
     (case op
       :add :int
       :minus :int
-      :and :int
+      :and :bool
       :or :bool
       :equals :bool
       :concat :string)))
