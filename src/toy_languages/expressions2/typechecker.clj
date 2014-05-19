@@ -87,7 +87,7 @@
         :minus (and (is-type lexp :int) (is-type rexp :int))
         :and (and (is-type lexp :bool) (is-type rexp :bool))
         :or (and (is-type lexp :bool) (is-type rexp :bool))
-        :equals (= (type-exp lexp) (type-exp rexp))
+        :equals (= (type-exp table lexp) (type-exp table rexp))
         :concat (and (is-type lexp :string) (is-type rexp :string))))))
 
 (defn- check-exp [table exp]
