@@ -43,11 +43,11 @@
       t
       (let [d (first ds)
             const-id (first d)
-            value (nth d 1)
+            exp (nth d 1)
             id (nth const-id 1)
-            var-type (first (nth value 1))
+            exp-type (type-exp t exp)
             id-key (keyword id)
-            new-table (assoc t id-key var-type)]
+            new-table (assoc t id-key exp-type)]
         (if (contains? t id-key)
           (throw (Throwable. (str "Constant '" id "' already declared!")))
           (recur (subvec ds 1) new-table))))))
@@ -67,7 +67,6 @@
   (let [node (first ast)
         exp (nth ast 1)
         is-type #(= (type-exp table exp) %)]
-    (println table)
     (and
       (check-exp table exp)
       (case node
