@@ -4,10 +4,10 @@
 (def grammar
   "program = exp
 
-   <exp> = cexp
-         | unary-exp
-         | binary-exp
-         | let-exp
+   <exp> = let-exp
+         / cexp
+         / unary-exp
+         / binary-exp
 
    <cexp> = value / const-id / <'('> exp <')'>
 
@@ -24,10 +24,11 @@
               | exp eq cexp
               | exp concat cexp
 
-   let-exp = <'let'> const-dec <'in'> exp
+   let-exp = <'let'> const-dec-list <'in'> exp
+
+   <const-dec-list> = const-dec (<','> const-dec)*
 
    <const-dec> = <'var'> const-id <'='> exp
-               | const-dec <','> const-dec
 
    int = int-literal
    bool = bool-literal
