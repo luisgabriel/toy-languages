@@ -10,5 +10,5 @@
     (if parsed
       (if (typechecker/check ast-or-failure)
         (interpreter/evaluate ast-or-failure)
-        "Type error!")
+        (throw (Throwable. "Type error.")))
       ast-or-failure)))
