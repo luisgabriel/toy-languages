@@ -15,7 +15,7 @@
         (System/exit 0))
       (try
         (->> input
-             (core/exec)
+             (core/eval)
              (println))
         (catch java.lang.Throwable t
           (println (str "Error: " (.getMessage t)))))
