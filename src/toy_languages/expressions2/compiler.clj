@@ -1,4 +1,5 @@
-(ns toy-languages.expressions2.compiler)
+(ns toy-languages.expressions2.compiler
+  (:refer-clojure :exclude [compile]))
 
 (declare compile-exp)
 
@@ -60,7 +61,7 @@
       :unary-exp (compile-unary subtree)
       :binary-exp (compile-binary subtree))))
 
-(defn compi [ast]
+(defn compile [ast]
   (let [node (first ast)
         exp (nth ast 1)]
     (case node
