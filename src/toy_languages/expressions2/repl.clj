@@ -1,8 +1,7 @@
 (ns toy-languages.expressions2.repl
-  (:require [toy-languages.expressions2.core :as core])
-  (:gen-class))
+  (:require [toy-languages.expressions2.core :as core]))
 
-(defn -main [& args]
+(defn run []
   (println "+------------------------------+")
   (println "|  Expression Language 2 REPL  |")
   (println "+------------------------------+")
