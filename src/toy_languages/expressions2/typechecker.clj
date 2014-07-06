@@ -55,7 +55,7 @@
 (defn- check-id [table id]
   (if (contains? table (keyword id))
     true
-    (Throwable. (str "Unknown constant '" id "'."))))
+    (throw (Throwable. (str "Unknown constant '" id "'.")))))
 
 (defn- check-let [table content]
   (let [decs (first content)
