@@ -3,8 +3,13 @@
 
 (declare compile-exp)
 
-(defn- compile-value [value]
-  (nth (first value) 1))
+(defn- compile-value [node]
+  (let [tuple (first node)
+        kind (first tuple)
+        value (nth tuple 1)]
+    (if (= kind :string)
+      (str "\"" value "\"")
+      value)))
 
 (defn- compile-id [subtree]
   (symbol (first subtree)))
