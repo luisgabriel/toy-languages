@@ -1,4 +1,5 @@
-(ns toy-languages.expressions2.interpreter)
+(ns toy-languages.expressions2.interpreter
+  (:require [clojure.string :as string]))
 
 (defmacro dbg[x] `(let [x# ~x] (println "dbg:" '~x "=" x#) x#))
 
@@ -51,7 +52,7 @@
       :and (and lvalue rvalue)
       :or (or lvalue rvalue)
       :equals (= lvalue rvalue)
-      :concat (concat lvalue rvalue))))
+      :concat (string/join "" (concat lvalue rvalue)))))
 
 (defn- eval-exp [table exp]
   (let [kind (first exp)
