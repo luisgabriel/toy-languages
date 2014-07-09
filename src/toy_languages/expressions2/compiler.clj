@@ -54,7 +54,7 @@
       :and `(and ~lcode ~rcode)
       :or `(or ~lcode ~rcode)
       :equals `(= ~lcode ~rcode)
-      :concat `(concat ~lcode ~rcode))))
+      :concat `(str ~lcode ~rcode))))
 
 (defn- compile-exp [exp]
   (let [kind (first exp)
